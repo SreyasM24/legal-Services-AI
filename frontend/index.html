@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AXIOM — Legal Research & Document Intelligence</title>
+  <meta name="description" content="AXIOM — AI-Powered Legal Document Analysis and Information Retrieval platform. Extract text from PDF, DOCX, and TXT, detect legal clauses, and retrieve passages via TF-IDF.">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <!-- Site Header -->
+  <header class="site-header" role="banner">
+    <div class="header-container">
+      <div class="brand-section">
+        <div class="brand-logo" aria-hidden="true">A</div>
+        <div class="brand-titles">
+          <span class="brand-name">AXIOM</span>
+          <span class="brand-subtitle">LEGAL RESEARCH & DOCUMENT INTELLIGENCE</span>
+        </div>
+      </div>
+
+      <nav class="nav-wrapper" role="navigation" aria-label="Main Navigation">
+        <ul class="nav-tabs" role="tablist">
+          <li role="presentation">
+            <button class="nav-tab-btn active" role="tab" aria-selected="true" data-tab="overview" id="tab-overview">
+              Overview
+            </button>
+          </li>
+          <li role="presentation">
+            <button class="nav-tab-btn" role="tab" aria-selected="false" data-tab="documents" id="tab-documents">
+              Documents <span class="badge badge-sage" id="header-doc-count">0</span>
+            </button>
+          </li>
+          <li role="presentation">
+            <button class="nav-tab-btn" role="tab" aria-selected="false" data-tab="analysis" id="tab-analysis">
+              Document Analysis
+            </button>
+          </li>
+          <li role="presentation">
+            <button class="nav-tab-btn" role="tab" aria-selected="false" data-tab="search" id="tab-search">
+              Legal Search
+            </button>
+          </li>
+        </ul>
+      </nav>
+
+      <div class="header-meta">
+        <div class="header-tagline">
+          RESEARCH • ANALYSIS • EVIDENCE
+        </div>
+        <button class="mobile-menu-btn" id="mobile-toggle" aria-label="Toggle Navigation Menu">☰</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-content" role="main">
+
+    <!-- TAB 1: OVERVIEW -->
+    <section class="tab-panel active" id="panel-overview" role="tabpanel" aria-labelledby="tab-overview">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Legal Document Analysis & Information Retrieval</h1>
+          <p class="section-desc">
+            AXIOM is a specialized legal technology platform designed for automated text extraction, 
+            rule-based legal clause classification, TF-IDF extractive summarization, and passage-level source retrieval.
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Session Metrics -->
+      <div class="grid-4" style="margin-bottom: 2rem;">
+        <div class="stat-box">
+          <span class="stat-label">Indexed Documents</span>
+          <span class="stat-value" id="stat-total-docs">0</span>
+          <span class="stat-desc">Currently in session memory</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Clause Categories</span>
+          <span class="stat-value">8</span>
+          <span class="stat-desc">Rule-based pattern models</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Supported Formats</span>
+          <span class="stat-value" style="font-size: 1.45rem; padding-top: 0.35rem;">PDF • DOCX • TXT</span>
+          <span class="stat-desc">Up to 10 MB per document</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-label">Retrieval Engine</span>
+          <span class="stat-value" style="font-size: 1.45rem; padding-top: 0.35rem;">TF-IDF + Cosine</span>
+          <span class="stat-desc">Sublinear TF passage scoring</span>
+        </div>
+      </div>
+
+      <!-- Upload Interface Card -->
+      <div class="upload-card">
+        <div class="card-header">
+          <h2 class="card-title">Upload Legal Document</h2>
+          <span class="stat-desc">Select a PDF, DOCX, or plain text file to ingest</span>
+        </div>
+
+        <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Upload document dropzone">
+          <svg class="dropzone-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+          </svg>
+          <div class="dropzone-title">Drag & drop your legal document here</div>
+          <div class="dropzone-hint">
+            Supports native digital PDFs (with text layer), Microsoft Word documents (.docx), and plain text agreements (.txt).
+          </div>
+          <div class="dropzone-formats">
+            <span class="format-pill">PDF</span>
+            <span class="format-pill">DOCX</span>
+            <span class="format-pill">TXT</span>
+            <span class="format-pill">Max 10 MB</span>
+          </div>
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-browse-file" style="margin-top: 0.5rem;">
+            Browse Local Files
+          </button>
+          <input type="file" id="file-input" accept=".pdf,.docx,.txt" style="display: none;" aria-label="File upload input">
+        </div>
+
+        <!-- Selected File Preview (Client-side validation state) -->
+        <div class="selected-file-preview" id="selected-file-box" style="display: none;">
+          <div class="file-info-group">
+            <span class="file-type-badge" id="preview-file-type">TXT</span>
+            <div>
+              <div class="file-name-text" id="preview-file-name">document.txt</div>
+              <div class="file-size-text" id="preview-file-size">0 KB</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 0.5rem; align-items: center;">
+            <button type="button" class="btn btn-primary btn-sm" id="btn-process-upload">
+              Upload & Extract Document
+            </button>
+            <button type="button" class="btn btn-danger btn-sm" id="btn-cancel-file" title="Remove selection">
+              ✕ Cancel
+            </button>
+          </div>
+        </div>
+
+        <!-- Validation Message Container -->
+        <div id="upload-validation-msg" style="margin-top: 1rem; display: none;"></div>
+      </div>
+
+      <!-- Recent Documents Section -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Recent Session Documents</h2>
+          <button class="btn btn-secondary btn-sm" id="btn-view-all-docs">View All Documents →</button>
+        </div>
+
+        <div id="overview-recent-docs">
+          <!-- Clean Empty State -->
+          <div class="empty-state">
+            <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+            <h3 class="empty-state-title">No Documents Loaded Yet</h3>
+            <p class="empty-state-text">
+              Upload a legal contract, agreement, or memorandum above to extract text, inspect clauses, and run TF-IDF passage retrieval.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- TAB 2: DOCUMENTS LIBRARY -->
+    <section class="tab-panel" id="panel-documents" role="tabpanel" aria-labelledby="tab-documents">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Document Library</h1>
+          <p class="section-desc">
+            Inspect all loaded documents in current session memory. Access full extracted text, section breakdowns, and initiate deep legal analysis.
+          </p>
+        </div>
+        <div>
+          <button class="btn btn-primary btn-sm" id="btn-nav-upload">
+            + Ingest New Document
+          </button>
+        </div>
+      </div>
+
+      <!-- Search / Filter Bar -->
+      <div class="card" style="margin-bottom: 1.5rem; padding: 1rem 1.25rem;">
+        <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+          <input type="text" class="search-input" id="doc-filter-input" placeholder="Filter documents by filename or format (e.g. NDA, .pdf)..." style="padding: 0.55rem 1rem;">
+          <span class="stat-desc" id="doc-filter-count">Showing 0 documents</span>
+        </div>
+      </div>
+
+      <!-- Document Table Container -->
+      <div id="documents-table-wrapper">
+        <!-- Clean Empty State -->
+        <div class="empty-state">
+          <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+          </svg>
+          <h3 class="empty-state-title">The Document Library is Empty</h3>
+          <p class="empty-state-text">
+            No legal files have been added to the session memory yet. Use the upload tool to load a PDF, DOCX, or TXT file.
+          </p>
+          <button class="btn btn-secondary btn-sm" id="btn-library-empty-upload">
+            Upload Document Now
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- TAB 3: DOCUMENT ANALYSIS -->
+    <section class="tab-panel" id="panel-analysis" role="tabpanel" aria-labelledby="tab-analysis">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Document Analysis & Clause Identification</h1>
+          <p class="section-desc">
+            Comprehensive NLP analysis: descriptive metrics, entity extraction, sentence-level extractive summarization, and rule-based clause detection across 8 legal categories.
+          </p>
+        </div>
+        <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+          <label for="analysis-doc-select" style="font-size: 0.88rem; font-weight: 600; color: var(--text-secondary);">
+            Document:
+          </label>
+          <select id="analysis-doc-select" class="select-input" style="min-width: 220px;">
+            <option value="">-- Select a Loaded Document --</option>
+          </select>
+          <button class="btn btn-primary btn-sm" id="btn-run-analysis" disabled>
+            Analyze Document
+          </button>
+        </div>
+      </div>
+
+      <!-- Legal Disclaimer Banner -->
+      <div class="legal-disclaimer-banner">
+        <svg class="disclaimer-icon" width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <div>
+          <strong>Legal Information Notice:</strong> AXIOM is an educational analysis and legal research tool. 
+          All statistics, summaries, and clause detections are rule-based heuristics intended for preliminary document review. 
+          This tool does not provide legal opinions, warranties of enforceability, or attorney-client advice.
+        </div>
+      </div>
+
+      <!-- Analysis Results Container -->
+      <div id="analysis-results-container">
+        <!-- Clean Empty State -->
+        <div class="empty-state">
+          <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+          </svg>
+          <h3 class="empty-state-title">No Document Selected for Analysis</h3>
+          <p class="empty-state-text">
+            Choose an ingested legal agreement from the dropdown above to inspect its extractive summary, descriptive metrics, and detected legal clauses.
+          </p>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- TAB 4: LEGAL SEARCH -->
+    <section class="tab-panel" id="panel-search" role="tabpanel" aria-labelledby="tab-search">
+      <div class="section-header">
+        <div>
+          <h1 class="section-title">Legal Information Retrieval</h1>
+          <p class="section-desc">
+            Search across your indexed document corpus using Scikit-learn TF-IDF vectorization and Cosine Similarity. 
+            Results return verbatim passages with exact source chunk, page, and section attribution.
+          </p>
+        </div>
+      </div>
+
+      <!-- Search Form Card -->
+      <div class="search-form-card">
+        <form id="search-form">
+          <div class="search-input-wrapper">
+            <input type="text" class="search-input" id="search-query-input" placeholder="Enter legal inquiry (e.g. 'immediate termination for material breach', 'indemnify and hold harmless', 'governing law')..." required>
+            <button type="submit" class="btn btn-primary" id="btn-submit-search">
+              Retrieve Passages
+            </button>
+          </div>
+
+          <div class="search-controls">
+            <div class="control-group">
+              <label for="search-scope-select">Search Scope:</label>
+              <select id="search-scope-select" class="select-input">
+                <option value="all">All Indexed Documents</option>
+              </select>
+            </div>
+
+            <div class="control-group">
+              <label for="search-topk-select">Max Results (Top-K):</label>
+              <select id="search-topk-select" class="select-input">
+                <option value="3">Top 3 Passages</option>
+                <option value="5" selected>Top 5 Passages</option>
+                <option value="10">Top 10 Passages</option>
+                <option value="15">Top 15 Passages</option>
+              </select>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Search Results Area -->
+      <div id="search-results-area">
+        <!-- Clean Empty State -->
+        <div class="empty-state">
+          <svg class="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <h3 class="empty-state-title">Enter a Legal Inquiry to Search</h3>
+          <p class="empty-state-text">
+            Search queries will be compared numerically against indexed document chunks using TF-IDF cosine similarity. 
+            Exact source references (document name, page number, section heading, chunk index) will be attributed to every match.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Document Detail / Raw Text Modal -->
+  <div class="modal-overlay" id="doc-modal" role="dialog" aria-modal="true" aria-labelledby="modal-doc-title">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <h3 class="card-title" id="modal-doc-title">Document Inspection</h3>
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-close-modal" aria-label="Close modal">✕</button>
+      </div>
+      <div class="modal-body" id="modal-doc-body">
+        <!-- Dynamically rendered document structure and text -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary btn-sm" id="btn-copy-doc-text">Copy Full Text</button>
+        <button type="button" class="btn btn-primary btn-sm" id="btn-analyze-modal-doc">Analyze This Document</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-container">
+      <div class="footer-brand">
+        <strong>AXIOM</strong> — Legal Research & Document Intelligence
+      </div>
+      <div class="footer-credit">
+        Built by Sreyas | AI Project Presentation
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

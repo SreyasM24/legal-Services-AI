@@ -1,0 +1,3 @@
+"""
+LexiScope automated test suite.
+"""
